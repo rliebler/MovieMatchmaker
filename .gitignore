@@ -1,0 +1,14 @@
+# Environment variables / API secrets
+.env
+
+# Google OAuth credentials
+credentials.json
+token.json
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Mac system files
+.DS_Store
+

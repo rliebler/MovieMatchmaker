@@ -1,11 +1,13 @@
 import os
 import requests
+from GoogleSheets import save_search
 from dotenv import load_dotenv
 from Genres import GENRES
 
 load_dotenv("../.env")
 
 bearer_token = os.getenv("TMDB_BEARER_TOKEN")
+spreadsheet_id = os.getenv("GOOGLE_SHEET_ID")
 
 # Create headers for TMDB API requests
 headers = {
@@ -117,6 +119,15 @@ else:
 # Get only the top 3 movies
 top_movies = matching_movies[:3]
 other_movies = matching_movies[3:]
+
+save_search(
+    spreadsheet_id,
+    "Becca",
+    actor_name,
+    genre,
+    minimum_year,
+    top_movies
+)
 
 
         # --------------------------------
