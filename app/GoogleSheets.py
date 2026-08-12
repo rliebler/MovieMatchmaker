@@ -1,54 +1,44 @@
-import os.path
+import os
 from datetime import datetime
 
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets"
+]
 
 
 def get_sheets_service():
 
-    creds = None
+    private_key = os.getenv("GOOGLE_PRIVATE_KEY")
 
-    # Check if we've already logged into Google
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file(
-            "token.json",
-            SCOPES
-        )
+    # Environment variables sometimes store \n literally.
+    # Convert them back into real line breaks.
+    if private_key:
+        private_key = private_key.replace("\\n", "\n")
 
-    # If credentials don't exist or aren't valid
-    if not creds or not creds.valid:
+    service_account_info = {
+        "type": os.getenv("GOOGLE_TYPE"),
+        "project_id": os.getenv("GOOGLE_PROJECT_ID"),
+        "private_key_id": os.getenv("GOOGLE_PRIVATE_KEY_ID"),
+        "private_key": private_key,
+        "client_email": os.getenv("GOOGLE_CLIENT_EMAIL"),
+        "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+        "token_uri": os.getenv("GOOGLE_TOKEN_URI")
+    }
 
-        # Refresh expired credentials
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-
-        # Otherwise ask user to log into Google
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json",
-                SCOPES
-            )
-
-            creds = flow.run_local_server(port=0)
-
-        # Save login information for next time
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-
-    # Connect to Google Sheets
-    service = build(
-        "sheets",
-        "v4",
-        credentials=creds
+    credentials = service_account.Credentials.from_service_account_info(
+        service_account_info,
+        scopes=SCOPES
     )
 
-    return service
+    return build(
+        "sheets",
+        "v4",
+        credentials=credentials
+    )
 
 
 def save_search(
@@ -89,7 +79,11 @@ def save_search(
         body=body
     ).execute()
 
-# now to get user history
+
+# --------------------------------
+# Get user history
+# --------------------------------
+
 def get_user_history(spreadsheet_id, user):
 
     service = get_sheets_service()
@@ -114,17 +108,17 @@ def get_user_history(spreadsheet_id, user):
             if row_user == user:
 
                 history.append({
-                "timestamp": row[0],
-                "actor": row[2],
-                "genre": row[3],
-                "minimum_year": row[4],
-                "movie1": row[5],
-                "rating1": row[6],
-                "movie2": row[7],
-                "rating2": row[8],
-                "movie3": row[9],
-                "rating3": row[10]
-})
+                    "timestamp": row[0],
+                    "actor": row[2],
+                    "genre": row[3],
+                    "minimum_year": row[4],
+                    "movie1": row[5],
+                    "rating1": row[6],
+                    "movie2": row[7],
+                    "rating2": row[8],
+                    "movie3": row[9],
+                    "rating3": row[10]
+                })
 
     # Show newest searches first
     history.reverse()
