@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+    <div class="text-end mb-3">
+
+        <a
+            href="/history"
+            class="btn btn-outline-secondary"
+        >
+            Recent Search History
+        </a>
+
+    </div>
+
+    <title>Movie Matchmaker</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+    <style>
+
+        .movie-logo {
+            width: 400px;
+            max-width: 100%;
+            height: auto;
+        }
+
+</style>
+
+</head>
+
+
+<body class="bg-light">
+
+    <div class="container py-5">
+
+        <!-- ============================== -->
+        <!-- Page Title / Description -->
+        <!-- ============================== -->
+
+        <div class="text-center mb-5">
+
+            <img
+                src="{{ url_for('static', filename='images/MovieMatchMakerLogo.png') }}"
+                alt="Movie Matchmaker"
+                class="movie-logo"
+            >   
+
+            <p class="lead text-secondary">
+                Find your next movie based on your favorite actor,
+                preferred genre, and earliest release year.
+            </p>
+
+        </div>
+
+
+        <!-- ============================== -->
+        <!-- Search Form -->
+        <!-- ============================== -->
+
+        <div class="row justify-content-center">
+
+            <div class="col-md-8 col-lg-6">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <h2 class="h4 text-center mb-4">
+                            Find Your Movie Matches
+                        </h2>
+
+
+                        <form method="POST" action="/">
+
+                            <!-- Actor -->
+                            <div class="mb-4">
+
+                                <label
+                                    for="actor"
+                                    class="form-label fw-semibold"
+                                >
+                                    Actor
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="actor"
+                                    name="actor"
+                                    placeholder="e.g. Matt Damon"
+                                    value="{{ actor if actor else '' }}"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- Genre -->
+                            <div class="mb-4">
+
+                                <label
+                                    for="genre"
+                                    class="form-label fw-semibold"
+                                >
+                                    Genre
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="genre"
+                                    name="genre"
+                                >
+
+                                    <option value="">
+                                        All Genres
+                                    </option>
+
+                                    {% for genre_name in genres %}
+
+                                        <option
+                                            value="{{ genre_name }}"
+                                            {% if genre == genre_name %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            {{ genre_name }}
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Minimum Year -->
+                            <div class="mb-4">
+
+                                <label
+                                    for="minimum_year"
+                                    class="form-label fw-semibold"
+                                >
+                                    Earliest Release Year
+                                </label>
+
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    id="minimum_year"
+                                    name="minimum_year"
+                                    placeholder="e.g. 2000"
+                                    min="1900"
+                                    max="2026"
+                                    value="{{ minimum_year if minimum_year else '' }}"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- Error Message -->
+                            {% if error %}
+
+                                <div class="alert alert-danger">
+                                    {{ error }}
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- Buttons -->
+                            <div class="d-grid gap-2">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary btn-lg"
+                                >
+                                    Find My Movies
+                                </button>
+
+                                <a
+                                    href="/"
+                                    class="btn btn-outline-secondary"
+                                >
+                                    Clear
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================== -->
+        <!-- Results -->
+        <!-- ============================== -->
+
+        {% if results %}
+
+            <div class="mt-5">
+
+                <div class="text-center mb-4">
+
+                    <h2>
+                        {% if results.genre %}
+                            Top 3 {{ results.genre }} Movies
+                        {% else %}
+                            Top 3 Movies
+                        {% endif %}
+                    </h2>
+
+                    <p class="text-secondary">
+                        Starring {{ results.actor_name }}
+                        since {{ results.minimum_year }}
+                    </p>
+
+                </div>
+
+
+                <div class="row">
+
+                    {% for movie in results.top_movies %}
+
+                        <div class="col-md-4 mb-4">
+
+                            <div class="card h-100 shadow-sm">
+
+                                <!-- Movie Poster -->
+                                {% if movie.poster_path %}
+
+                                    <img
+                                        src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}"
+                                        class="card-img-top"
+                                        alt="{{ movie.title }} poster"
+                                    >
+
+                                {% endif %}
+
+
+                                <div class="card-body">
+
+                                    <!-- Movie Ranking and Title -->
+                                    <h4 class="card-title">
+                                        {{ loop.index }}. {{ movie.title }}
+                                    </h4>
+
+
+                                    <!-- Release Year -->
+                                    <p>
+                                        <strong>
+                                            Release Year:
+                                        </strong>
+
+                                        {{ movie.release_date[:4] }}
+                                    </p>
+
+
+                                    <!-- Rating -->
+                                    <p>
+                                        <strong>
+                                            Rating:
+                                        </strong>
+
+                                        {{ "%.2f"|format(movie.vote_average) }}/10
+                                    </p>
+
+
+                                    <!-- Top Billing -->
+                                    <p>
+                                        <strong>
+                                            Top Billing:
+                                        </strong>
+
+                                        {{ movie.top_billing }}
+                                    </p>
+
+
+                                    <!-- Synopsis -->
+                                    <p>
+                                        <strong>
+                                            Synopsis:
+                                        </strong>
+                                    </p>
+
+                                    <p>
+                                        {{ movie.overview }}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- ============================== -->
+        <!-- Other Matching Movies -->
+        <!-- ============================== -->
+
+        {% if results and results.other_movies %}
+
+            <div class="mt-4 mb-5">
+
+                <h3 class="mb-3">
+                    Other {{ results.genre }} Movies Starring
+                    {{ results.actor_name }} Since
+                    {{ results.minimum_year }}
+                </h3>
+
+
+                <div class="list-group">
+
+                    {% for movie in results.other_movies %}
+
+                        <div
+                            class="list-group-item
+                                   d-flex
+                                   justify-content-between
+                                   align-items-center"
+                        >
+
+                            <span>
+
+                                {{ movie.title }}
+
+                                {% if movie.release_date %}
+
+                                    ({{ movie.release_date[:4] }})
+
+                                {% endif %}
+
+                            </span>
+
+
+                            <span class="badge bg-secondary">
+
+                                {{ "%.2f"|format(movie.vote_average) }}/10
+
+                            </span>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+    </div>
+    <!-- Footer -->
+    <footer class="text-center py-4 mt-5 border-top bg-white">
+        <p class="text-secondary mb-0">
+            Liebler Studios &copy; 2026
+        </p>
+    </footer>
+
+    <!-- Bootstrap JavaScript -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+</body>
+
+</html>

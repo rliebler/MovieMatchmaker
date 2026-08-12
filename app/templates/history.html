@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Recent Search History</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+</head>
+
+
+<body class="bg-light">
+
+    <div class="container py-5">
+
+        <!-- Header -->
+        <div class="text-center mb-5">
+
+            <h1 class="display-5 fw-bold">
+                Recent Search History
+            </h1>
+
+            <p class="lead text-secondary">
+                Review your previous Movie Matchmaker searches and recommendations.
+            </p>
+
+            <a
+                href="/"
+                class="btn btn-outline-primary"
+            >
+                Back to Movie Matchmaker
+            </a>
+
+        </div>
+
+
+        {% if history %}
+
+            <div class="table-responsive">
+
+                <table
+                    class="table table-striped table-hover align-middle"
+                >
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Actor</th>
+                            <th>Genre</th>
+                            <th>Minimum Year</th>
+                            <th>Movie 1</th>
+                            <th>Movie 1 Rating</th>
+                            <th>Movie 2</th>
+                            <th>Movie 2 Rating</th>
+                            <th>Movie 3</th>
+                            <th>Movie 3 Rating</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for search in history %}
+
+                            <tr>
+
+                                <td>
+                                    {{ search.timestamp }}
+                                </td>
+
+                                <td>
+                                    {{ search.actor }}
+                                </td>
+
+                                <td>
+                                    {{ search.genre }}
+                                </td>
+
+                                <td>
+                                    {{ search.minimum_year }}
+                                </td>
+
+                                <td>
+                                    {{ search.movie1 }}
+                                </td>
+
+                                <td>
+                                    {{ search.rating1 }}/10
+                                </td>
+
+                                <td>
+                                    {{ search.movie2 }}
+                                </td>
+
+                                <td>
+                                    {{ search.rating2 }}/10
+                                </td>
+
+                                <td>
+                                    {{ search.movie3 }}
+                                </td>
+
+                                <td>
+                                    {{ search.rating3 }}/10
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info text-center">
+
+                You don't have any previous searches yet.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+</body>
+    <!-- Footer -->
+<footer class="text-center py-4 mt-5 border-top bg-white">
+    <p class="text-secondary mb-0">
+        Liebler Studios &copy; 2026
+    </p>
+</footer>
+
+</html>
