@@ -323,56 +323,48 @@
         <!-- Other Matching Movies -->
         <!-- ============================== -->
 
-        {% if results and results.other_movies %}
+  {% if results and results.other_movies %}
 
-            <div class="mt-4 mb-5">
+    <div class="mt-4 mb-5">
 
-                <h3 class="mb-3">
-                    Other {{ results.genre }} Movies Starring
-                    {{ results.actor_name }} Since
-                    {{ results.minimum_year }}
-                </h3>
+        <h3 class="mb-3">
+            Other {{ results.genre }} Movies Starring
+            {{ results.actor_name }} Since
+            {{ results.minimum_year }}
+        </h3>
 
+        <div class="list-group">
 
-                <div class="list-group">
+            {% for movie in results.other_movies %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        {{ movie.title }} ({{ movie.release_date[:4] }})
+                    </span>
 
-                    {% for movie in results.other_movies %}
-
-                        <div
-                            class="list-group-item
-                                   d-flex
-                                   justify-content-between
-                                   align-items-center"
-                        >
-
-                            <span>
-
-                                {{ movie.title }}
-
-                                {% if movie.release_date %}
-
-                                    ({{ movie.release_date[:4] }})
-
-                                {% endif %}
-
-                            </span>
-
-
-                            <span class="badge bg-secondary">
-
-                                {{ "%.2f"|format(movie.vote_average) }}/10
-
-                            </span>
-
-                        </div>
-
-                    {% endfor %}
-
+                    {% if movie.vote_average >= 7.99 %}
+                        <span class="badge bg-success">
+                            {{ "%.2f"|format(movie.vote_average) }}/10
+                        </span>
+                    {% elif movie.vote_average >= 6.99 %}
+                        <span class="badge bg-success-subtle text-success-emphasis">
+                            {{ "%.2f"|format(movie.vote_average) }}/10
+                        </span>
+                    {% elif movie.vote_average >= 5.49 %}
+                        <span class="badge bg-warning text-dark">
+                            {{ "%.2f"|format(movie.vote_average) }}/10
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger">
+                            {{ "%.2f"|format(movie.vote_average) }}/10
+                        </span>
+                    {% endif %}
                 </div>
+            {% endfor %}
 
-            </div>
+        </div>
+    </div>
 
-        {% endif %}
+{% endif %}
 
 
     </div>
