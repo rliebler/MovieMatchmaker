@@ -107,7 +107,8 @@ def get_movie_recommendations(actor, genre, minimum_year):
             # Check genre AND minimum year
             if release_year >= minimum_year:
                 if genre_id is None or genre_id in movie["genre_ids"]:
-                    matching_movies.append(movie)
+                    if movie.get("vote_count", 0) >= 100:
+                        matching_movies.append(movie)
 
     # Sort highest rated to lowest rated
     matching_movies = sorted(
